@@ -23,10 +23,10 @@ $factory->define(App\User::class, function (Faker\Generator $faker) {
 
 $factory->define(App\Models\Post::class, function (Faker\Generator $faker) {
 	return [
-		'title' => $faker->words,
+		'title' => $faker->words(6, true),
 		'url' => $faker->url,
-		'content' => $faker->paragraphs,
-		'created_by' => $faker->App\User::all()->random()->id,
+		'content' => $faker->paragraphs(3, true),
+		'created_by' => App\User::all()->random()->id,
 		
 	];
 });
