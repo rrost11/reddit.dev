@@ -1,15 +1,8 @@
-@extends ('layouts.master')
+@extends('layouts.master')
+@section('page-heading', 'Show Post')
 
-@section ('title', 'Post')
-
-@section ('content')
-<div class="page-header">
-	<h1>A Post...</h1>
-</div>
-	<h2>{{ $post->title }}</h2>
-	<blockquote>
-		<p>{{ $post->content }}</p>
-	</blockquote>
-		<a href={{ $post->url }}>{{ $post->url }}</a>
-
+@section('content')
+	<h1>{{ $post->title }}</h1>
+	<p>{{ $post->content }}</p>
+	<a href="{{ $post->url }}">Go to this thing</a>
 @stop
