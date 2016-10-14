@@ -9,7 +9,7 @@
 | and give it the controller to call when that URI is requested.
 |
 */
-Route::get('/', ['middleware'=>'auth'], function () {
+Route::get('/', function () {
     return redirect()->action('PostsController@index');
 });
 Route::resource('posts', 'PostsController');

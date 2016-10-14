@@ -4,5 +4,5 @@
 @section('content')
 	<h1>{{ $post->title }}</h1>
 	<p>{{ $post->content }}</p>
-	<a href="{{ $post->url }}">Go to this thing</a>
+	<a href="{{ $post->url }}">Check Out This Post</a>
 @stop

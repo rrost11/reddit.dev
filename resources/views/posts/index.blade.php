@@ -14,7 +14,7 @@
                 <h3>{{ $post->title }}</h3>
                 <p>{{ $post->content }}</p>
                 <p>Posted On: {{ $post->created_at->diffForHumans() }}</p>
-                <a class="btn btn-primary" href="{{ action('PostsController@show', $post->id) }}">View Project <span class="glyphicon glyphicon-chevron-right"></span></a>
+                <a class="btn btn-primary" href="{{ action('PostsController@show', $post->id) }}">View This Post <span class="glyphicon glyphicon-chevron-right"></span></a>
             </div>
         </div>
         <!-- /.row -->
