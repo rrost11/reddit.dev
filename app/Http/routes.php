@@ -47,7 +47,8 @@ Route::delete('/posts/{post}', "PostsController@destroy");
 
 
 //User Controller
-Route::resource('users', 'UsersController');
+Route::resource('posts', 'PostsController');
+Route::resource('users', 'UsersController', ['except' => ['create', 'store']]);
 
 // Test
 Route::get('/orm-test', function(){
