@@ -1,29 +1,49 @@
 @extends('layouts.master')
-@section('page-heading', 'List Posts')
+
+@section('title')
+    Index
+@stop
 
 @section('content')
+    
+    
     @foreach($posts as $post)
-        <!-- Project One -->
-        <div class="row">
-            <div class="col-md-7">
-                <a href="{{ action('PostsController@show', $post->id) }}">
-                    <img class="img-responsive" src="http://placehold.it/700x300" alt="">
-                </a>
-            </div>
-            <div class="col-md-5">
-                <h3>{{ $post->title }}</h3>
-                <p>{{ $post->content }}</p>
-                <p>Posted On: {{ $post->created_at->diffForHumans() }}</p>
-                <a class="btn btn-primary" href="{{ action('PostsController@show', $post->id) }}">View This Post <span class="glyphicon glyphicon-chevron-right"></span></a>
-            </div>
-        </div>
-        <!-- /.row -->
+        <div class="col-xs-12 col-sm-6 col-md-3">
+            <div class="well show-box">
+                <h4 class="text-center">
+                    {{ substr($post->title, 0,15) . "..."}}
+                </h4>
 
-        <hr>
-        <!-- /Project One -->
+                <span>User: </span><a href="{{action('UsersController@show',$post->user->id)}}" title="">{{$post->user->name}}
+                </a>
+
+                {{-- <a href="{{$post->url}}" title="">
+                    <img src="{{$post->url}}" alt="">
+                </a>
+ --}}
+                <div class="panel panel-default">
+                  <div class="panel-heading">
+                    <h4 class="panel-title">Content</h4>
+                  </div>
+                  <div class="panel-body">
+                        {{ substr($post->content, 0,20) . "..."}}
+                  </div>
+                </div>
+
+                <div class="pull-left">
+                    Posted: {{$post->created_at->setTimezone('America/Chicago')->diffForHumans()}}
+                </div>
+                <br>
+                <a href="{{action('PostsController@show', $post->id)}}" title="" class="btn btn-primary text-center">
+                    See Post      
+                </a>
+
+                <hr>
+            </div>
+        </div>  
     @endforeach
 
-    <div class="row text-center">
+    <div class="text-center">
         {!! $posts->render() !!}
     </div>
 @stop
