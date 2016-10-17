@@ -5,18 +5,14 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Models\Post;
+use App\User;
+
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Log;
 
 class PostsController extends Controller
 {
-
-    public function __construct()
-    {
-        $this->middleware('auth', ['except' => ['index', 'show']]);
-    }
-
-
     /**
      * Display a listing of the resource.
      *
@@ -24,9 +20,11 @@ class PostsController extends Controller
      */
     public function index()
     {
-        $posts = Post::paginate(20);
-        $data = ['posts' => $posts];
-        return view('posts.index')->with($data);
+
+       $posts = Post::paginate(8);
+       $data['posts'] = $posts;
+
+       return view('posts.index')->with($data);
     }
 
     /**
@@ -47,25 +45,31 @@ class PostsController extends Controller
      */
     public function store(Request $request)
     {
-        $rules = array(
-            'title'     => 'required|max:100',
-            'url'       => 'required',
-            'content'   => 'required',
-        );
-
+        
         $request->session()->flash('ERROR_MESSAGE', 'Post was not saved. Please see messages under inputs');
-        $this->validate($request, $rules);
+
+        $this->validate($request,Post::$rules);
+
         $request->session()->forget('ERROR_MESSAGE');
 
-        $post = new Post;
-        $post->created_by = $request->user()->id;
-        $post->title = $request->title;
-        $post->url = $request->url;
-        $post->content = $request->content;
+        $post = new Post();
+        $post->created_by = 1;
+        $post->title= $request->get('title');
+        $post->url= $request->get('url');
+        $post->content= $request->get('content');
+
+
         $post->save();
 
-        $request->session()->flash('SUCCESS_MESSAGE', 'Post was saved successfully');
 
+        Log::info("Saving post values {$post->created_by} {$post->title} {$post->url}
+            {$post->content}");
+
+        
+        $request->session()->flash('SUCCESS_MESSAGE', 'Post was successfully saved.');
+        
+        // return redirect()->action('PostsController@index');
+        //go to show and pass the id to show the record added
         return redirect()->action('PostsController@show', $post->id);
     }
 
@@ -77,8 +81,10 @@ class PostsController extends Controller
      */
     public function show($id)
     {
-        $post = Post::find($id);
-        $data = ['post' => $post];
+        $post = Post::findorfail($id);
+
+
+        $data['post'] = $post;
         return view('posts.show')->with($data);
     }
 
@@ -90,8 +96,9 @@ class PostsController extends Controller
      */
     public function edit($id)
     {
-        $post = Post::find($id);
-        $data = ['post' => $post];
+        $post = Post::findorfail($id);
+
+        $data['post'] = $post;
         return view('posts.edit')->with($data);
     }
 
@@ -104,20 +111,22 @@ class PostsController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $rules = array(
-            'title'     => 'required|max:100',
-            'url'       => 'required',
-            'content'   => 'required',
-        );
+        $request->session()->flash('ERROR_MESSAGE', 'Post was not updated. Please see messages under inputs');
 
-        $this->validate($request, $rules);
+        $this->validate($request,Post::$rules);
 
-        $post = Post::find($id);
-        $post->title = $request->title;
-        $post->url = $request->url;
-        $post->content = $request->content;
+        $request->session()->forget('ERROR_MESSAGE');
+
+        $post = Post::findorfail($id);
+
+        $post->title = $request->get('title');
+        $post->url = $request->get('url');
+        $post->content = $request->get('content');
         $post->save();
 
+        $request->session()->flash('SUCCESS_MESSAGE', 'Post was successfully updated.');
+
+        // return redirect()->action('PostsController@index');
         return redirect()->action('PostsController@show', $post->id);
     }
 
@@ -129,6 +138,10 @@ class PostsController extends Controller
      */
     public function destroy($id)
     {
-        return 'destroy';
+
+        $post = Post::findorfail($id);
+
+        $post->delete();
+        return redirect()->action('PostsController@index');
     }
 }
