@@ -2,6 +2,8 @@
 
 namespace App;
 
+use App\Models\BaseModel;
+
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Auth\Passwords\CanResetPassword;
@@ -10,7 +12,7 @@ use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 
-class User extends Model implements AuthenticatableContract,
+class User extends BaseModel implements AuthenticatableContract,
                                     AuthorizableContract,
                                     CanResetPasswordContract
 {
@@ -43,4 +45,10 @@ class User extends Model implements AuthenticatableContract,
             'email' => 'required|email',
             'password' => 'required|min:4',
         ];
+
+    public function posts(){
+
+        return $this->hasMany(Post::class, 'created_by');
+        
+    }
 }
