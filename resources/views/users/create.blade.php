@@ -1,7 +1,7 @@
 @extends('layouts.master')
 
 @section('title')
-	Create an User
+	Create User
 @stop
 
 @section('content')
@@ -31,7 +31,7 @@
 		@endif
 
 	  <div class="form-group">
-	    <label >Password</label>
+	    <label>Password</label>
 	    <input type="password" class="form-control" name="password" placeholder="Password" value="{{old('password')}}">
 	  </div>
 	  @if($errors->has('password'))

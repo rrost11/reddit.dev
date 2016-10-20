@@ -1,53 +1,54 @@
 @extends('layouts.master')
 
+@section('title')
+	Create a user
+@stop
+
 @section('content')
-<div class="container view">
-	<section>
-		<h1 class="section-title">Edit User</h1>
-		<form method="POST" action="{{ action('UsersController@update', $user->id) }}">
+	
+	<form method="POST" action="{{action('UsersController@update', $user->id)}}">
+		<div class="form-group">
+			{!! csrf_field() !!}
+			{!! method_field('PUT')!!}
+		</div>
+
+	  <div class="form-group">
+	    <label for="name"><h5 class="white">Name</h5></label>
+	    <input type="text" class="form-control" name="name" placeholder="name" value="{{old('name') == null ? $user->name : old('name')}}">
+	  </div>
+	  @if($errors->has('name'))
+			<div class="alert alert-danger">
+				{{$errors->first('name')}}
+			</div>
+		@endif
+
+	  <div class="form-group">
+	    <label for="exampleInputEmail1"><h5 class="white">Email address</h5></label>
+	    <textarea class="form-control" rows="3" name="email" placeholder="Email" >{{old('email') == null ? $user->email : old('email')}}</textarea>
+	  </div>
+	  @if($errors->has('email'))
+			<div class="alert alert-danger">
+				{{$errors->first('email')}}
+			</div>
+		@endif
+
+	 <div class="form-group">
+	    <label for=""><h5 class="white">Password</h5></label>
+	    <input type="password" class="form-control" name="password" placeholder="Password" value="">
+	  </div>
+	  @if($errors->has('password'))
+			<div class="alert alert-danger">
+				{{$errors->first('password')}}
+			</div>
+		@endif
+
+	  
+	  <button type="submit" class="btn btn-success pull-left">Submit</button>
+	</form>
+	<form action="{{action('UsersController@destroy', $user->id)}}" method="POST" >
 		{!! csrf_field() !!}
-		{{ method_field('PUT') }}
-			<div class="form-group">
-				<label for="name">Name</label>
-				<input 
-					type="text" 
-					class="form-control"
-					name="name" 
-					value="{{ old('name')?: $user->name }}">	
-			</div>
-			@include('partials.error', ['field' => 'name'])
-			<div class="form-group">
-				<label for="email">Email</label>
-				<input 
-					type="text" 
-					class="form-control"
-					name="email" 
-					value="{{ old('email')?: $user->email }}">	
-			</div>
-			@include('partials.error', ['field' => 'email'])
-<!-- 			<div class="form-group">
-				<label for="password">Password</label>
-				<input 
-					type="password" 
-					class="form-control"
-					name="password" 
-					value="{{ old('password') }}">				
-			</div>
-			@include('partials.error', ['field' => 'password'])
-			<div class="form-group">
-				<label for="password_confirmation">Password Confirm</label>
-				<input
-					type="password"
-					class="form-control"
-					name="password_confirmation"
-					id="password_confirmation"
-					value="{{ old('password_confirmation') }}">
-			</div>
-			@include('partials.error', ['field' => 'password_confirmation']) -->
-			<button type="submit" class="btn btn-primary">Submit</button>
-		</form>
-		<br>
-		<a href="{{ action('PostsController@index')}}">Go Back to Main Page</a>
-	</section>
-</div>
+		{!! method_field('DELETE')!!}
+		
+		<button type="submit" class="btn btn-danger pull-right">Delete</button>
+	</form>
 @stop

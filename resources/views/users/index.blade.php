@@ -1,44 +1,50 @@
 @extends('layouts.master')
 
+@section('title')
+    Index
+@stop
+
 @section('content')
-<div class="container">
-		<h1> {{ Auth::user()->name }} <h1>
-		<h3> {{ Auth::user()->email }} </h3><br>
+<h2 class="white" style="text-align: center">Users</h2>
+<br>
+    <form class="" method="GET" action="{{action('UsersController@index')}}">
+          <div class="navbar navbar-left">
+            <input type="text" name="searchName" class="form-control" placeholder="Search">
+          </div>
+          <button type="submit" class="btn">User Search</button>
+    </form>
+<br>
+    <hr>
+    <table class="table table-striped">
+    <thead>
+        <tr>
+            <th class="white">ID</th>
+            <th class="white">Name</th>
+            <th class="white">Email</th>
+        </tr>
+    </thead>
+    @foreach($users as $user)
+        <tbody>
+            <tr>
+                <td>
+                    <a href="{{action('UsersController@edit', $user->id)}}" class="btn btn-primary btn-sm">Edit</a>
+                    <a href="{{action('UsersController@destroy', $user->id)}}" class="btn btn-danger btn-sm">Delete</a>
+                </td>
+                <td>
+                <a href="{{action('UsersController@show', $user->id)}}" title="">
+                    
+                    {{$user->name}}
+                </a>
+                </td>
+                <td>{{$user->email}}</td>
+            </tr>
+        </tbody>
+    @endforeach
+    </table>
 
-		@if (Auth::user()->id)
-		<a href="{{ action('UsersController@edit', Auth::user()->id)}}" class="btn btn-success">Edit User Info</a>
-		<br>
-		<form method="POST" action="{{ action('UsersController@destroy', Auth::user()->id)}}">
-	        <input type="hidden" name="_method" value="DELETE">
-	        {{ method_field('DELETE') }}
-	        {!! csrf_field() !!}
-	        <button type="submit" class="btn btn-danger">Delete Account</button>
-	    </form><br>
-	    @endif
-	    <table class="table table-hover">
-            <thead>
-                <tr>
-                    <th>Id</th>
-                    <th>Title</th>
-                    <th>Url</th>
-                    <th>Posted</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-    	@foreach (Auth::user()->posts as $post)
-	    		<tr>
-                    <td> {{ $post->id }} </td>
-                    <td> {{ $post->title }} </td>                 
-                    <td> {{ $post->url }} </td>                 
-                    <td>{!! $post->created_at->setTimezone('America/Chicago')->format('l, F jS Y @ h:i:s A') !!}</td>
-                    <td><a href="{{ action('PostsController@show', $post->id)}}" class="btn btn-primary"><span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span>    Go To Post</a></td>
-                </tr>
-		@endforeach            
-            </tbody>
-        </table>
+    <div class="text-center">
+        {{-- {!! $users->render() !!} --}}
 
-
-	    <a href="{{ action('PostsController@index')}}">Go Back to Main Page</a>
-	</div>
+        {!! $users->appends(['searchName' => Request::get('searchName')])->render() !!}
+    </div>
 @stop
