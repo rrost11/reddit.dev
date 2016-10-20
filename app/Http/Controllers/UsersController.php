@@ -4,37 +4,35 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use App\User;
+use Hash;
+use App\Models\Post;
+
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
-use App\User;
-use App\Models\Post;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Hash;
 
 class UsersController extends Controller
 {
-    /*
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    //prevent users that aren't logged in from accessing page
     public function __construct()
     {
         $this->middleware('auth');
     }
-    public function index()
-    {
-        // $user = Auth::user()->id;
-
-        // if (!$user) {
-        //     Log::info("User with $id not found.");
-        //     abort(404);
-        // }
-
-        // $data = compact('user');
-        ///dd($data);
-        return view('users.index');
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index(Request $request)
+    {   
+        if(!$request->has('searchName')){
+            $users = User::paginate(9);
+            $data['users'] = $users;
+        }
+        else{
+            $data['users'] = User::search($request->get('searchName'))->paginate(9);
+        }
+        return view('users.index')->with($data);
     }
 
     /**
@@ -44,7 +42,7 @@ class UsersController extends Controller
      */
     public function create()
     {
-        //
+        return view('users.create');
     }
 
     /**
@@ -55,7 +53,23 @@ class UsersController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->session()->flash('ERROR_MESSAGE', 'User was not saved. Please see messages under inputs');
+
+        $this->validate($request,User::$rules);
+        
+        $request->session()->forget('ERROR_MESSAGE');
+        
+        $user = new User();
+
+        $user->name= $request->get('name');
+        $user->email= $request->get('email');
+        $user->password= Hash::make($request->get('password'));
+        $user->save();
+
+        $request->session()->flash('SUCCESS_MESSAGE', 'User was successfully created.');
+        
+        return redirect()->action('UsersController@show', $user->id);
+        // return redirect()->action('UsersController@index');
     }
 
     /**
@@ -66,17 +80,12 @@ class UsersController extends Controller
      */
     public function show($id)
     {
-        
-        $user = User::find($id);
-        
-        if (!$user) {
-            Log::info("User with $id not found.");
-            abort(404);
-        }
+       $user = User::findOrFail($id);
 
-        $data = compact('user');
-        ///dd($data);
-        return view('users.show', $data);
+       
+
+        $data['user'] = $user;
+        return view('users.show')->with($data);
     }
 
     /**
@@ -87,16 +96,10 @@ class UsersController extends Controller
      */
     public function edit($id)
     {
-        $user = User::find($id);
-        
-        if (!$user) {
-            Log::info("User with $id not found.");
-            abort(404);
-        }
+        $user = User::findOrFail($id);
 
-        $data = compact('user');
-        ///dd($data);
-        return view('users.edit', $data);
+        $data['user'] = $user;
+        return view('users.edit')->with($data);
     }
 
     /**
@@ -108,18 +111,26 @@ class UsersController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $user = User::find($id);
-        //dd($post);
-        if (!$user) {
-            Log::info("User with $id not found for edit.");
-            abort(404);
-        }
+        $request->session()->flash('ERROR_MESSAGE', 'User was not updated. Please see messages under inputs');
 
-        $user->name = $request->input('name');
-        $user->email = $request->input('email');
+        $this->validate($request,User::$rules);
+        
+        $request->session()->forget('ERROR_MESSAGE');
+        
+
+        $user = User::findOrFail($id);
+
+        
+
+        $user->name= $request->get('name');
+        $user->email= $request->get('email');
+        $user->password= Hash::make($request->get('password'));
         $user->save();
-        $request->session()->flash('message', 'Your account has been updated!');
-        return redirect()->action('UsersController@index', $user->id);
+
+        $request->session()->flash('SUCCESS_MESSAGE', 'User was successfully updated.');
+
+        // return redirect()->action('usersController@index');
+        return redirect()->action('UsersController@show', $user->id);
     }
 
     /**
@@ -128,47 +139,13 @@ class UsersController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request, $id)
+    public function destroy($id)
     {
+
+        $user = User::findOrFail($id);
         
-        $user = User::find($id);
-
-        if (!$user) {
-            Log::info("User with $id not found for delete.");
-            abort(404);
-        }
-
-        $posts = Post::where('created_by', $id)->delete();
+        
         $user->delete();
-        $request->session()->flash('message', 'Your Account has been deleted!');
-        return redirect()->action('PostsController@index');
-    }
-
-    public function editPassword($id) {
-
-        $user = User::find($id);
-
-        if (!$user) {
-            Log::info("User with $id not found for edit.");
-            abort(404);
-        }
-
-        return view('users.password')->with('user', $user);
-    }
-
-    public function updatePassword(Request $request, $id) {
-
-        $user = User::find($id);
-//dd($user);
-        if (!$user) {
-            Log::info("User with $id not found for edit.");
-            abort(404);
-        }
-
-        $user->password = Hash::make($request->input('password'));
-        $user->save();
-        $request->session()->flash('message', 'Your password has been updated!');
-        return redirect()->action('UsersController@index', $user->id);
-
+        return redirect()->action('UsersController@index');
     }
 }
