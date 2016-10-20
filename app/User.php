@@ -48,7 +48,12 @@ class User extends BaseModel implements AuthenticatableContract,
 
     public function posts(){
 
-        return $this->hasMany(Post::class, 'created_by');
+        return $this->hasMany('App\Models\Post', 'created_by');
         
+    }
+
+    public static function search($searchTerm){
+        return self::where('name', 'LIKE', '%'.$searchTerm.'%')
+            ->orWhere('email', 'LIKE', '%'.$searchTerm.'%');
     }
 }
