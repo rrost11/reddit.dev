@@ -14,6 +14,7 @@ Route::get('/', function () {
 });
 Route::resource('posts', 'PostsController');
 Route::resource('users', 'UsersController', ['except' => ['create', 'store']]);
+Route::post('/post/votes', 'PostsController@setVotes');
 
 // Authentication routes...
 Route::get('auth/login', 'Auth\AuthController@getLogin');
