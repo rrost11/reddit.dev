@@ -5,8 +5,8 @@ Post {{$post->id}}
 @stop
 
 @section('content')
-
-	<div class="col-sm-6 col-md-4 col-md-offset-1">
+<br>
+	<div class="col-md-4 col-md-offset-1">
 		<div class="jumbotron" style="width:250%">
 			
 			<h3 class="text-center">
@@ -17,13 +17,13 @@ Post {{$post->id}}
 			<hr>
 			<div class="col-md-offset-4">
 				<a href="{{$post->url}}" title="">
-					<img src="{{$post->url}}" alt="" class="img img-responsive">
+					<img src="/img/question-mark.jpg" alt="" class="img img-responsive" style="width:150px;height:150px;">
 				</a>
 			</div>
-
-			<div class="panel panel-default">
+			<br>
+			<div class="panel panel-primary">
 			  <div class="panel-heading">
-			    <h4 class="panel-title">Content</h4>
+			    <h3 class="panel-title">Content</h3>
 			  </div>
 			  <div class="panel-body">
 					{{ $post->content}}
@@ -43,6 +43,7 @@ Post {{$post->id}}
 			@endif
 
 		</div>
-	</div>	
+	</div>
+	<br>	
 
 @stop
