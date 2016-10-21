@@ -1,8 +1,8 @@
 @extends('layouts.master')
 
-@section('title')
-	Create User
-@stop
+@section('title', 'Create User')
+
+@section('header', 'Create User')
 
 @section('content')
 	<form method="POST" action="{{action('UsersController@store')}}">

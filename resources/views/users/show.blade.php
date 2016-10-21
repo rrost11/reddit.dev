@@ -1,8 +1,8 @@
 @extends('layouts.master')
 
-@section('title')
-User {{$user->id}}  
-@stop
+@section('title', 'Users Page')
+
+@section('header', $user->name )
 
 @section('content')
     
@@ -36,11 +36,11 @@ User {{$user->id}}
     <hr>
     @foreach($user->posts as $post)
         @if(count($user->posts) > 8)
-            <div class="col-xs-12 col-sm-6 col-md-3">
+            <div class="col-xs-12 col-sm-6 col-md-4">
         @elseif(count($user->posts) < 7 && count($user->posts) > 4)
             <div class="col-xs-12 col-sm-6 col-md-4">
         @else
-            <div class="col-xs-12 col-md-6">
+            <div class="col-xs-12 col-md-4">
         @endif
             <div class="well show-box">
             

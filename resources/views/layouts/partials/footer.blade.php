@@ -1,7 +1,7 @@
 <!-- Footer -->
 <footer>
 <br>
-    <hr>
+
     <br>
     <div class="row">
         <div class="col-lg-12 text-center">

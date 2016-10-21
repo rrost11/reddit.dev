@@ -3,19 +3,23 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Post;
-use App\User;
+
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+use App\Models\Post;
+use App\Models\Vote;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Illuminate\Support\Facades\Log;
 
 class PostsController extends Controller
 {
-    //prevent not logged in users from accessing the page
+    
+
     public function __construct()
     {
         $this->middleware('auth', ['except' => ['index', 'show']]);
     }
+
     /**
      * Display a listing of the resource.
      *
@@ -23,18 +27,9 @@ class PostsController extends Controller
      */
     public function index(Request $request)
     {
+        $data['request'] = $request;
+        $data['posts'] = (isset($request->search)) ? Post::search($request->search)->paginate(9) :  Post::with('user')->paginate(9);
 
-       // $posts = Post::paginate(6);
-
-       if($request->has('searchTitle'))
-       {
-
-            $data['posts'] = Post::search($request->get('searchTitle'))->paginate(12);
-       }
-        else{
-            $posts = Post::orderBy('created_at', 'desc')->paginate(12);
-            $data['posts'] = $posts;
-        }
         return view('posts.index')->with($data);
     }
 
@@ -57,30 +52,34 @@ class PostsController extends Controller
     public function store(Request $request)
     {
         
-        $request->session()->flash('ERROR_MESSAGE', 'Post was not saved. Please see messages under inputs');
 
-        $this->validate($request,Post::$rules);
-
+        $request->session()->flash('ERROR_MESSAGE', 'Invalid Inputs');
+        $this->validate($request, Post::$rules);
         $request->session()->forget('ERROR_MESSAGE');
 
         $post = new Post();
         $post->created_by = $request->user()->id;
-        $post->title= $request->get('title');
-        $post->url= $request->get('url');
-        $post->content= $request->get('content');
+        $post->title = $request->input('title');
+        $post->url = $request->input('url');
+        $post->content = $request->input('content');
+        $post->save();
+        if (!empty($request->file('image'))) {
+            if ($request->file('image')->isValid()) {
 
+                $post->image = '/img/post-images/' . $post->id . $request->file('image')->getClientOriginalName();
+
+                $request->file('image')->move(
+                    base_path() . '/public/img/post-images/', $post->image
+                );  
+            };
+        };
 
         $post->save();
 
+        Log::info('Created Post: ' . $post);
 
-        // Log::info("Saving post values {$post->created_by} {$post->title} {$post->url}
-        //     {$post->content}");
+        $request->session()->flash('SUCCESS_MESSAGE', 'Post was saved successfully');
 
-        
-        $request->session()->flash('SUCCESS_MESSAGE', 'Post was successfully saved.');
-        
-        // return redirect()->action('PostsController@index');
-        //go to show and pass the id to show the record added
         return redirect()->action('PostsController@show', $post->id);
     }
 
@@ -92,10 +91,7 @@ class PostsController extends Controller
      */
     public function show($id)
     {
-        $post = Post::findorfail($id);
-
-
-        $data['post'] = $post;
+        $data['post'] = Post::findOrFail($id);
         return view('posts.show')->with($data);
     }
 
@@ -107,9 +103,7 @@ class PostsController extends Controller
      */
     public function edit($id)
     {
-        $post = Post::findorfail($id);
-
-        $data['post'] = $post;
+        $data['post'] = Post::findOrFail($id);
         return view('posts.edit')->with($data);
     }
 
@@ -122,22 +116,19 @@ class PostsController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $request->session()->flash('ERROR_MESSAGE', 'Post was not updated. Please see messages under inputs');
-
-        $this->validate($request,Post::$rules);
-
+        $request->session()->flash('ERROR_MESSAGE', 'Invalid Inputs');
+        $this->validate($request, Post::$rules);
         $request->session()->forget('ERROR_MESSAGE');
 
-        $post = Post::findorfail($id);
-
-        $post->title = $request->get('title');
-        $post->url = $request->get('url');
-        $post->content = $request->get('content');
+        $post = Post::findOrFail($id);
+        $post->title = $request->title;
+        $post->url = $request->url;
+        $post->content = $request->content;
         $post->save();
+        Log::info('Updated Post: ' . $post);
 
-        $request->session()->flash('SUCCESS_MESSAGE', 'Post was successfully updated.');
+        $request->session()->flash('SUCCESS_MESSAGE', 'Post was saved successfully');
 
-        // return redirect()->action('PostsController@index');
         return redirect()->action('PostsController@show', $post->id);
     }
 
@@ -149,44 +140,36 @@ class PostsController extends Controller
      */
     public function destroy($id)
     {
-
-        $post = Post::findorfail($id);
-
+        $post = Post::findOrFail($id);
+        $vote = Vote::where('post_id', '=', $id);
+        $vote->delete();
         $post->delete();
-        return redirect()->action('PostsController@index');
+        return back();
     }
 
-    public function search(Request $request){
-        
-    }
+    public function setVote(Request $request) {
 
-    public function setVotes(Request $request){
         $vote = Vote::with('post')->firstOrCreate([
-            
             'post_id' => $request->input('post_id'),
             'user_id' => $request->user()->id
         ]);
-        
+
         $vote->vote = $request->input('vote');
         $vote->save();
-        
+
         $post = $vote->post;
-        $post->save();
-        
-        $post->vote_score = $post->voteScore();
+
+        $post->upVotes = $post->upVotes();
+        $post->downVotes = $post->downVotes();
+
         $data = [
-            
-            'vote_score' => $post->vote_score,
+            'upVotes' => $post->upVotes,
+            'downVotes' => $post->downVotes,
             'vote' => $vote->vote
-            
         ];
-        
+
         return back()->with($data);
     }
-
-
-
-
 
 
 }

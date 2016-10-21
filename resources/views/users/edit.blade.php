@@ -1,8 +1,8 @@
 @extends('layouts.master')
 
-@section('title')
-	Create a user
-@stop
+@section('title', 'Edit User')
+
+@section('header', 'Edit User')
 
 @section('content')
 	

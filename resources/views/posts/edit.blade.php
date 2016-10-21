@@ -1,8 +1,8 @@
 @extends('layouts.master')
 
-@section('title')
-	Create a Post
-@stop
+@section('title', 'Edit Post')
+
+@section('header', 'Edit Post')
 
 @section('content')
 <h3 class="white" style="text-align: center">Edit Post</h3>
@@ -48,11 +48,9 @@
 	  <div class="row">
 	  <button type="submit" style="margin-left: 21px" class="btn btn-success pull-left">Submit</button>
 	</form>
-	<form action="{{action('PostsController@destroy', $post->id)}}" method="POST" class="pull-left">
+	<form class="text-center" method="POST" action="{{ action('PostsController@destroy', $post->id) }}">
 		{!! csrf_field() !!}
 		{!! method_field('DELETE')!!}
-
-		<button type="submit" style="margin-left: 990px" class="btn btn-danger">Delete</button>
-		</div>
+		<button style="margin:5px;" class="btn btn-danger pull-right" type="submit">Delete Post</button>
 	</form>
 @stop

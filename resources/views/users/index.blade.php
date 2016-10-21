@@ -1,42 +1,34 @@
 @extends('layouts.master')
 
-@section('title')
-    Index
-@stop
+@section('title', 'All Users')
+
+@section('header', 'All Users')
 
 @section('content')
 <h2 class="white" style="text-align: center">Users</h2>
 <br>
-    <form class="" method="GET" action="{{action('UsersController@index')}}">
-          <div class="navbar navbar-left">
-            <input type="text" name="searchName" class="form-control" placeholder="Search">
-          </div>
-          <button type="submit" class="btn">User Search</button>
-    </form>
-<br>
+
     <hr>
+    <br>
     <table class="table table-striped">
     <thead>
         <tr>
-            <th class="white">ID</th>
+            <th class="white">User ID</th>
             <th class="white">Name</th>
             <th class="white">Email</th>
+            <th class="white">Member Since</th>
         </tr>
     </thead>
     @foreach($users as $user)
         <tbody>
             <tr>
-                <td>
-                    <a href="{{action('UsersController@edit', $user->id)}}" class="btn btn-primary btn-sm">Edit</a>
-                    <a href="{{action('UsersController@destroy', $user->id)}}" class="btn btn-danger btn-sm">Delete</a>
-                </td>
-                <td>
-                <a href="{{action('UsersController@show', $user->id)}}" title="">
-                    
-                    {{$user->name}}
-                </a>
-                </td>
+            <td>{{$user->id}}</td>
+                <td><a href="{{ action('UsersController@show', $user->id)}}">{{ $user->name }}</a></td>
                 <td>{{$user->email}}</td>
+                
+                <td>{{$user->created_at->diffForHumans()}}</td>
+                
+                
             </tr>
         </tbody>
     @endforeach

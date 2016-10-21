@@ -48,16 +48,16 @@
         @endif
         
       </ul>
-      
-      <form class="navbar-form navbar-right" method="GET" action="{{action('PostsController@index')}}">
-        
-        <div class="form-group">
-          <input type="text" name="searchTitle" class="form-control">
-        </div>
-        <button type="submit" class="btn btn-primary">Search</button>
-      </form>
+                    
+                    <form method="GET" action="{{ (Request::is('users') || Request::is('users/*')) ? action("UsersController@index") : action("PostsController@index") }}" class="navbar-form navbar-right">
+            
+            <div class="form-group">
+              <input id="search" name="search" type="search" class="form-control empty" placeholder="Search {{ (Request::is('users') || Request::is('users/*')) ? "Users" : "Posts" }}">
+            </div>
+            <button class="btn btn-primary submit">Search</button>
+          </form>
      @if(Auth::check())
-        <span><div class="navbar-brand" style="margin-left:190px;">
+        <span><div class="navbar-brand" style="margin-left:150px;">
            Welcome,  {{Auth::user()->name}}!
         </div></span>
       @endif

@@ -6,35 +6,41 @@ use Illuminate\Database\Eloquent\Model;
 
 class Post extends BaseModel
 {
-    
-    public function vote()
+    public static $rules = [
+        'title' => 'required|min:4',
+        'url' => 'required',
+        'content' => 'required'
+    ];
+
+
+
+    public function user()
     {
-    return \App\Vote::where('post_id', $this->id)->sum('vote');
+        return $this->belongsTo('App\User', 'created_by', 'id');
     }
 
-    
-
-
-
-    public static  $rules = [
-            'title' => 'required',
-            'url' => 'required',
-            'content' => 'required',
-        ];
-
-    public function user(){
-    	return $this->belongsTo('App\User', 'created_by' , 'id');
+    public static function search($searchTerm)
+    {
+        return self::join('users', 'users.id', '=', 'posts.created_by')
+                    ->where('posts.title', 'LIKE', '%' . $searchTerm . '%')
+                    ->orWhere('posts.content', 'LIKE', '%' . $searchTerm . '%')
+                    ->orWhere('users.name', 'LIKE', '%' . $searchTerm . '%')
+                    ->orderBy('posts.created_at');
     }
 
-    
-    // public funtion getModifiedAttribute()
-    // {
-    //     return 'foo';
-    // }
-
-
-    public static function search($searchTerm){
-    	return self::where('title', 'LIKE', '%'.$searchTerm.'%')
-    		->orWhere('content', 'LIKE', '%'.$searchTerm.'%')->with('user');
+    public function votes()
+    {
+        return $this->hasMany(Vote::class);
     }
+
+    public function upvotes()
+    {
+        return $this->votes()->where('vote', '=', 1);
+    }
+
+    public function downvotes()
+    {
+        return $this->votes()->where('vote', '=', 0);
+    }
+
 }

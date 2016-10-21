@@ -1,9 +1,9 @@
 @extends('layouts.master')
 
 @section('content')
-<h3 class="white" style="text-align: center">Register</h3>
+<h1 class="white text-center">Register</h1>
 <br>
-<hr>
+
 	@if(count($errors))
 		<div class="alert alert-danger">
 		@foreach($errors->all() as $error)

@@ -1,10 +1,11 @@
 @extends('layouts.master')
 
-@section('title')
-Post {{$post->id}}	
-@stop
+@section('title', $post->title)
+
+@section('header', '"' . $post->title . '"')
 
 @section('content')
+
 <br>
 	<div class="col-md-4 col-md-offset-1">
 		<div class="jumbotron" style="width:250%">
@@ -35,11 +36,27 @@ Post {{$post->id}}
 			</div>
 			<br>
 			@if(Auth::check())
-				<p>
-					<a href="{{action('PostsController@edit', $post->id)}}" title="" class="btn btn-primary">
+			<div>
+					<br>
+					<a href="{{action('PostsController@edit', $post->id)}}" title="" class="btn btn-primary pull-right">
 							Edit
 					</a>
-				</p>
+						<form  method="POST" action="{{ action('PostsController@setVote') }}">
+							{!! csrf_field() !!}
+							<input type="hidden" name="vote" value="1">
+							<input type="hidden" name="post_id" value="{{ $post->id }}">
+							<button type="submit" class="btn btn-success pull-left"><span class="glyphicon glyphicon-thumbs-up"> {{ $post->upVotes->count() }} </span></button>
+						</form>
+						<form method="POST" action="{{ action('PostsController@setVote') }}">
+							{!! csrf_field() !!}
+							<input type="hidden" name="vote" value="-1">
+							<input type="hidden" name="post_id" value="{{ $post->id }}">
+							<button type="submit" class="btn btn-danger pull-left"><span class=" glyphicon glyphicon-thumbs-down"> {{ $post->downVotes->count() }} </span></button>
+						</form>
+						
+				</div>
+				<br>
+				
 			@endif
 
 		</div>

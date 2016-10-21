@@ -4,16 +4,13 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-use App\User;
 use Hash;
-use App\Models\Post;
-
+use App\User;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
 class UsersController extends Controller
 {
-    //prevent users that aren't logged in from accessing page
     public function __construct()
     {
         $this->middleware('auth');
@@ -24,52 +21,10 @@ class UsersController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
-    {   
-        if(!$request->has('searchName')){
-            $users = User::paginate(9);
-            $data['users'] = $users;
-        }
-        else{
-            $data['users'] = User::search($request->get('searchName'))->paginate(9);
-        }
+    {
+
+        $data['users'] = ($request->has('search')) ? User::search($request->search)->paginate(6) :  User::paginate(20);
         return view('users.index')->with($data);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        return view('users.create');
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        $request->session()->flash('ERROR_MESSAGE', 'User was not saved. Please see messages under inputs');
-
-        $this->validate($request,User::$rules);
-        
-        $request->session()->forget('ERROR_MESSAGE');
-        
-        $user = new User();
-
-        $user->name= $request->get('name');
-        $user->email= $request->get('email');
-        $user->password= Hash::make($request->get('password'));
-        $user->save();
-
-        $request->session()->flash('SUCCESS_MESSAGE', 'User was successfully created.');
-        
-        return redirect()->action('UsersController@show', $user->id);
-        // return redirect()->action('UsersController@index');
     }
 
     /**
@@ -80,11 +35,9 @@ class UsersController extends Controller
      */
     public function show($id)
     {
-       $user = User::findOrFail($id);
+        $data['user'] = User::findOrFail($id);
+        $data['posts'] = $data['user']->posts()->paginate(3);
 
-       
-
-        $data['user'] = $user;
         return view('users.show')->with($data);
     }
 
@@ -96,9 +49,7 @@ class UsersController extends Controller
      */
     public function edit($id)
     {
-        $user = User::findOrFail($id);
-
-        $data['user'] = $user;
+        $data['user'] = User::findOrFail($id);
         return view('users.edit')->with($data);
     }
 
@@ -111,25 +62,19 @@ class UsersController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $request->session()->flash('ERROR_MESSAGE', 'User was not updated. Please see messages under inputs');
-
-        $this->validate($request,User::$rules);
-        
+        $request->session()->flash('ERROR_MESSAGE', 'Invalid Inputs');
+        $this->validate($request, User::$rules);
         $request->session()->forget('ERROR_MESSAGE');
-        
 
         $user = User::findOrFail($id);
-
-        
-
-        $user->name= $request->get('name');
-        $user->email= $request->get('email');
-        $user->password= Hash::make($request->get('password'));
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->password = Hash::make($request->password);
         $user->save();
+        Log::info('Updated User: ' . $user);
 
-        $request->session()->flash('SUCCESS_MESSAGE', 'User was successfully updated.');
+        $request->session()->flash('SUCCESS_MESSAGE', 'Update Successful');
 
-        // return redirect()->action('usersController@index');
         return redirect()->action('UsersController@show', $user->id);
     }
 
@@ -141,11 +86,8 @@ class UsersController extends Controller
      */
     public function destroy($id)
     {
-
         $user = User::findOrFail($id);
-        
-        
         $user->delete();
-        return redirect()->action('UsersController@index');
+        return redirect()->action('PostsController@index');
     }
 }

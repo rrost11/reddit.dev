@@ -1,13 +1,13 @@
 @extends('layouts.master')
 
-@section('title')
-    Create a Post
-@stop
+@section('title', 'Create Post')
+
+@section('header', 'Create Post')
 
 @section('content')
-<h3 class="white" style="text-align: center">Create Post</h3>
+<h1 class="white" style="text-align: center">Create Post</h1>
 <br>
-<hr>
+
     
     <form method="POST" action="{{action('PostsController@store')}}">
         <div class="form-group">
@@ -43,7 +43,7 @@
                 {{$errors->first('content')}}
             </div>
         @endif
-      
-      <button type="submit" class="btn">Submit</button>
+      <br>
+      <button type="submit" class="btn btn-success">Submit</button>
     </form>
 @stop
