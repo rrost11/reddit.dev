@@ -23,23 +23,24 @@
 
 					<div class="form-group">
 					    <input type="text" class="form-control" id="email" name="email" placeholder="Email" value="{{ old('email') }}" autofocus>
-					</div>
+				
 
-					@if($errors->has('email'))
+					{{-- @if($errors->has('email'))
 						<div class="alert alert-danger col-xs-12">
 							{{ $errors->first('email') }}
 						</div>
 					@endif
-
-					<div class="form-group">
+ --}}
+					
 					    <input type="password" class="form-control" id="password" name="password" placeholder="Password">
-					</div>
+					
 
-					@if($errors->has('password'))
+					{{-- @if($errors->has('password'))
 						<div class="alert alert-danger col-xs-12">
 							{{ $errors->first('password') }}
 						</div>
-					@endif
+					@endif --}}
+					</div>
 					<br>
 					<div class="row">
 						<div class="col-sm-6">
